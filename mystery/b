@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+
+echo "started" "$(date)"
+
 target_memberships="$(grep 'CLUE:' crimescene |\
 grep 'card' |\
 sed 's/^.*cards for //; s/\..*$//' |\
@@ -24,7 +27,26 @@ while IFS= read -r line; do
     process_membership "$line"
 done <<< "$target_memberships"
 
-less <<< "$memberships_preview"
+mapfile -t memfiles <<< "$target_memberships"
+pushd 2>&1 >/dev/null memberships
+raw_possible="$(awk -F$'\n' '
+{
+    seen_count[$1]++;
+}
+END {
+    for (name in seen_count)
+    {
+        if (seen_count[name] >= ARGC - 1)
+        {
+            print name;
+        }
+    }
+}
+' "${memfiles[@]}")"
+popd  2>&1 >/dev/null
 
-echo "done"
+possible="$(sort <<< $raw_possible)"
+echo "$possible"
+
+echo "ended" "$(date)"
 
