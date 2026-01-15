@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+grep 'CLUE:' crimescene | grep 'card' | sed 's/^.*cards for //; s/\..*$//' | sed 's/, /\n/g'

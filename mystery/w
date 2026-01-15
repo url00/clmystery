@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+while inotifywait -q -e modify b; do
+    ./b
+done
