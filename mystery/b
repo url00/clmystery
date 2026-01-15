@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+set -x
 
-echo "started" "$(date)"
+
+date
 
 target_memberships="$(grep 'CLUE:' crimescene |\
 grep 'card' |\
@@ -15,14 +17,9 @@ sed 's/and_the_//')"
 process_membership() {
     pushd 2>&1 >/dev/null memberships
     sort "$1" -o "$1"
-    memberships_preview+="--- $1 ---
-"
-    memberships_preview+="$(head $1)"
-    memberships_preview+=$'\n\n'
     popd  2>&1 >/dev/null
 }
 
-memberships_preview=""
 while IFS= read -r line; do
     process_membership "$line"
 done <<< "$target_memberships"
@@ -46,7 +43,6 @@ END {
 popd  2>&1 >/dev/null
 
 possible="$(sort <<< $raw_possible)"
-echo "$possible"
 
-echo "ended" "$(date)"
+date
 
