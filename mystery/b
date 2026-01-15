@@ -1,3 +1,30 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-grep 'CLUE:' crimescene | grep 'card' | sed 's/^.*cards for //; s/\..*$//' | sed 's/, /\n/g'
+target_memberships="$(grep 'CLUE:' crimescene |\
+grep 'card' |\
+sed 's/^.*cards for //; s/\..*$//' |\
+sed 's/, /\n/g' |\
+sed 's/ /_/g' |\
+sed '/^the/ c Terminal_City_Library' |\
+sed 's/and_the_//')"
+
+process_membership() {
+    pushd 2>&1 >/dev/null memberships
+    sort "$1" -o "$1"
+    memberships_preview+="--- $1 ---
+"
+    memberships_preview+="$(head $1)"
+    memberships_preview+=$'\n\n'
+    popd  2>&1 >/dev/null
+}
+
+memberships_preview=""
+while IFS= read -r line; do
+    process_membership "$line"
+done <<< "$target_memberships"
+
+less <<< "$memberships_preview"
+
+echo "done"
+
