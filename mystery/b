@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
-set -euo pipefail
-
-set -x
 
 
-date
+clues="$(grep 'CLUE:' crimescene)"
 
 target_memberships="$(grep 'CLUE:' crimescene |\
 grep 'card' |\
@@ -42,7 +39,27 @@ END {
 ' "${memfiles[@]}")"
 popd  2>&1 >/dev/null
 
+
+
+git add .
+git commit -m 'maybe progress?'
+git push
+
+exit 0
+
 possible="$(sort <<< $raw_possible)"
+while IFS= read -r name; do
+    echo "$name"
+    pushd 2>&1 >/dev/null interviews
 
-date
+    for file in ./*; do
+        head "$file"
+        #grep -F -- "$name" "$file"
+    done
 
+    popd 2>&1 >/dev/null
+done <<<"$possible"
+exit 0
+
+echo "$clues"
+ls -la

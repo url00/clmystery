@@ -1,5 +1,28 @@
 #!/usr/bin/env bash
 
-while inotifywait -q -e close_write b; do
-    ./b
+#set -x
+
+self_hash="$(sha256sum w)"
+target_hash="$(sha256sum b)"
+
+while :; do
+    sleep 0.1
+    new_self_hash="$(sha256sum w)"
+    
+    if [[ "$self_hash" != "$new_self_hash" ]]; then
+        echo "change detected in watcher script, quitting"
+        exit 0
+    fi
+
+
+    new_target_hash="$(sha256sum b)"
+    if [[ "$target_hash" != "$new_target_hash" ]]; then
+        sleep 0.1
+        echo "$(date)"
+        target_hash="$new_target_hash"
+        ./b
+    fi
+
+
 done
+
